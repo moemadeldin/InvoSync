@@ -30,8 +30,9 @@ use Illuminate\Support\Carbon;
 final class User extends Authenticatable
 {
     use HasFactory;
-    use Notifiable;
     use HasUuids;
+    use Notifiable;
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -56,6 +57,7 @@ final class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     protected function name(): Attribute
     {
         return Attribute::make(

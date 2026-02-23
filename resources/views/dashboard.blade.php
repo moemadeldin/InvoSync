@@ -8,25 +8,28 @@
     @vite('resources/css/app.css')
 </head>
 
-<body class="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+<body class="min-h-screen bg-gray-900 text-gray-100">
 
-    <div class="bg-blue-600 dark:bg-gray-800 text-white px-6 py-4 flex justify-between items-center shadow-md">
-        <h1 class="text-xl font-semibold">
-            Dashboard
+    <nav class="bg-gray-800 border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold">
+            <a href="{{ route('dashboard') }}">
+                Dashboard
+            </a>
         </h1>
-    </div>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            @method('DELETE')
+            <button type="submit"
+                class="cursor-pointer px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition duration-200">
+                Logout
+            </button>
+        </form>
+    </nav>
 
-    <div class="p-8">
-        <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 transition-all duration-300">
-
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-                Welcome, {{ Auth::user()->name }}!
-            </h2>
-
-            <p class="text-gray-600 dark:text-gray-300">
-                You are now logged in.
-            </p>
-
+    <div class="p-6">
+        <div class="max-w-4xl mx-auto bg-gray-800 p-8 rounded-xl shadow-2xl">
+            <h2 class="text-2xl font-bold mb-4">Welcome, {{ Auth::user()->name }}!</h2>
+            <p class="text-gray-400">You are now logged in.</p>
         </div>
     </div>
 
