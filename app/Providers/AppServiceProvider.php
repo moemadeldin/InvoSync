@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\Invoice;
+use App\Observers\InvoiceObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -29,6 +31,7 @@ final class AppServiceProvider extends ServiceProvider
         Model::unguard();
         Model::shouldBeStrict();
         $this->configureRateLimiting();
+        Invoice::observe(InvoiceObserver::class);
     }
 
     private function configureRateLimiting(): void

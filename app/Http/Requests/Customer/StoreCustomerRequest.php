@@ -6,6 +6,7 @@ namespace App\Http\Requests\Customer;
 
 use App\Rules\NoNumbers;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 final class StoreCustomerRequest extends FormRequest
 {
@@ -16,7 +17,7 @@ final class StoreCustomerRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255', new NoNumbers()],
-            'email' => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:customers,email'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'max:255'],
             'phone' => ['nullable', 'string', 'digits:11'],
             'address' => ['nullable', 'string', 'max:255'],
         ];

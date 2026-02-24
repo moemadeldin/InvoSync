@@ -7,4 +7,6 @@ namespace App\Utils;
 final readonly class Constants
 {
     public const int NUMBER_OF_PAGINATED_CUSTOMERS = 10;
+
+    public const int NUMBER_OF_PAGINATED_INVOICES = 5;
 }

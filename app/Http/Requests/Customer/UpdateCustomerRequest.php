@@ -20,7 +20,7 @@ final class UpdateCustomerRequest extends FormRequest
         return [
             'name' => ['nullable', 'string', 'max:255', new NoNumbers()],
             'email' => ['nullable', 'string', 'email:rfc,dns', 'max:255', Rule::unique('customers', 'email')->ignore($customer->id)],
-            'phone' => ['nullable', 'string', 'max:11'],
+            'phone' => ['nullable', 'string', 'max:11', Rule::unique('customers', 'phone')->ignore($customer->id)],
             'address' => ['nullable', 'string', 'max:255'],
         ];
     }

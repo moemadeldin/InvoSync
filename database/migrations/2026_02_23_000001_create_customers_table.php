@@ -16,8 +16,8 @@ return new class extends Migration
                 ->constrained()
                 ->restrictOnDelete();
             $table->string('name');
-            $table->string('email')->unique();
-            $table->string('phone')->unique()->nullable();
+            $table->string('email');
+            $table->string('phone')->nullable();
             $table->string('address')->nullable();
             $table->timestamps();
             $table->index(['user_id', 'email']);
