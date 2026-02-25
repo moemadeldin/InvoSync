@@ -9,7 +9,7 @@ final readonly class UpdateInvoiceData
     public function __construct(
         public string $customerId,
         public string $status,
-        public float $taxAmount = 0.0,
+        public float $taxRate = 0.0,
         public ?array $items = null,
         public ?string $invoiceDate = null,
         public ?string $dueDate = null,
@@ -25,7 +25,7 @@ final readonly class UpdateInvoiceData
 
         $status = $data['status'];
 
-        $tax = $data['tax'] ?? 0;
+        $taxRate = (float) $data['tax_rate'] ?? 0;
 
         $invoiceDate = $data['invoice_date'] ?? null;
         $dueDate = $data['due_date'] ?? null;
@@ -35,7 +35,7 @@ final readonly class UpdateInvoiceData
         return new self(
             customerId: (string) $customerId,
             status: (string) $status,
-            taxAmount: (float) $tax,
+            taxRate: $taxRate,
             items: $itemsData !== null
                 ? array_map(InvoiceItemData::fromArray(...), $itemsData)
                 : null,

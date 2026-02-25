@@ -32,8 +32,8 @@ final readonly class UpdateInvoiceAction
                 $this->invoiceItemSync->sync($invoice, $data->items);
             }
 
-            $taxAmount = $data->items !== null ? $data->taxAmount : (float) $invoice->tax;
-            $this->invoiceItemSync->applyTotals($invoice, $this->resolveItems($invoice, $data), $taxAmount);
+            $taxRate = $data->taxRate ?? $invoice->tax_rate;
+            $this->invoiceItemSync->applyTotals($invoice, $this->resolveItems($invoice, $data), $taxRate);
 
             return $invoice;
         });

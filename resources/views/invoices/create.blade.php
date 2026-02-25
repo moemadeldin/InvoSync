@@ -66,8 +66,8 @@
                 </div>
 
                 <div>
-                    <label for="tax" class="block text-slate-300 text-sm font-medium mb-2">Tax</label>
-                    <input type="number" name="tax" id="tax" value="{{ old('tax', 0) }}" step="0.01" min="0"
+                    <label for="tax_rate" class="block text-slate-300 text-sm font-medium mb-2">Tax</label>
+                    <input type="number" name="tax_rate" id="tax_rate" value="{{ old('tax_rate', 0) }}" step="0.01" min="0"
                         class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">
                         @error('tax')
                             <div class="mt-1 text-sm text-red-400">{{ $message }}</div>

@@ -22,7 +22,7 @@ final class UpdateInvoiceRequest extends FormRequest
             'invoice_date' => ['nullable', 'date'],
             'due_date' => ['nullable', 'date', 'after_or_equal:invoice_date'],
             'notes' => ['nullable', 'string'],
-            'tax' => ['nullable', 'numeric', 'min:0'],
+            'tax_rate' => ['nullable', 'numeric', 'min:0'],
             'items' => ['nullable', 'array', 'min:1'],
             'items.*.description' => ['nullable', 'string', 'max:255'],
             'items.*.qty' => ['nullable', 'integer', 'min:1'],

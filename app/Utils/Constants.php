@@ -11,4 +11,6 @@ final readonly class Constants
     public const int NUMBER_OF_PAGINATED_INVOICES = 5;
 
     public const int NUMBER_OF_PAGINATED_SALES_RETURNS = 5;
+
+    public const int NUMBER_OF_PAGINATED_PAYMENTS = 5;
 }

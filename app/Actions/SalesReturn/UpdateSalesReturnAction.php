@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Actions\SalesReturn;
 
+use App\Enums\InvoiceStatus;
 use App\Enums\SalesReturnStatus;
 use App\Models\Invoice;
 use App\Models\SalesReturn;
 use App\Services\CalculateInvoiceSalesReturnService;
+use Illuminate\Support\Facades\DB;
 
 final readonly class UpdateSalesReturnAction
 {
@@ -17,27 +19,32 @@ final readonly class UpdateSalesReturnAction
 
     public function execute(SalesReturn $salesReturn, array $data): SalesReturn
     {
-        $oldStatus = $salesReturn->status;
-        $newStatus = SalesReturnStatus::from($data['status']);
+        return DB::transaction(function () use ($salesReturn, $data): SalesReturn {
+            $oldStatus = $salesReturn->status;
+            $newStatus = SalesReturnStatus::from($data['status']);
 
-        if (! empty($data['invoice_id'])) {
-            $invoice = Invoice::with('items')->find($data['invoice_id']);
-            [$itemsToSave, $subtotal] = $this->calculateItemsFromInvoice($data, $invoice);
-            $this->updateSalesReturn($salesReturn, $data, $subtotal);
-            $this->syncItems($salesReturn, $itemsToSave);
+            if (! empty($data['invoice_id'])) {
+                $invoice = Invoice::with('items')->findOrFail($data['invoice_id']);
+                [$itemsToSave, $subtotal] = $this->calculateItemsFromInvoice($data, $invoice);
 
-            $salesReturn = $salesReturn->fresh();
-            $this->handleStatusChange($salesReturn, $invoice, $oldStatus, $newStatus);
-        } else {
-            $this->updateSalesReturn($salesReturn, $data, 0);
-            $salesReturn->items()->delete();
+                $this->updateSalesReturn($salesReturn, $data, $subtotal);
+                $this->syncItems($salesReturn, $itemsToSave);
 
-            if ($salesReturn->invoice) {
-                $this->handleStatusChange($salesReturn, $salesReturn->invoice, $oldStatus, $newStatus);
+                $salesReturn = $salesReturn->fresh();
+                $this->handleStatusChange($salesReturn, $invoice, $oldStatus, $newStatus);
+                $this->syncInvoiceStatus($invoice);
+            } else {
+                $this->updateSalesReturn($salesReturn, $data, 0);
+                $salesReturn->items()->delete();
+
+                if ($salesReturn->invoice) {
+                    $this->handleStatusChange($salesReturn, $salesReturn->invoice, $oldStatus, $newStatus);
+                    $this->syncInvoiceStatus($salesReturn->invoice->fresh());
+                }
             }
-        }
 
-        return $salesReturn->fresh();
+            return $salesReturn->fresh();
+        });
     }
 
     private function calculateItemsFromInvoice(array $data, Invoice $invoice): array
@@ -46,7 +53,9 @@ final readonly class UpdateSalesReturnAction
         $subtotal = 0;
 
         foreach ($invoice->items as $item) {
-            $returnQty = (int) ($data['items'][$item->id]['quantity'] ?? 0);
+            $returnQty = (int) ($data['items'][$item->id]['qty'] ?? 0);
+            $returnQty = min($returnQty, $item->qty);
+
             if ($returnQty > 0) {
                 $itemTotal = $returnQty * (float) $item->unit_price;
                 $subtotal += $itemTotal;
@@ -81,9 +90,7 @@ final readonly class UpdateSalesReturnAction
     private function syncItems(SalesReturn $salesReturn, array $items): void
     {
         $salesReturn->items()->delete();
-        foreach ($items as $item) {
-            $salesReturn->items()->create($item);
-        }
+        $salesReturn->items()->createMany($items);
     }
 
     private function handleStatusChange(SalesReturn $salesReturn, Invoice $invoice, SalesReturnStatus $oldStatus, SalesReturnStatus $newStatus): void
@@ -92,6 +99,25 @@ final readonly class UpdateSalesReturnAction
             $this->salesReturnService->addReturn($invoice, $salesReturn);
         } elseif ($oldStatus === SalesReturnStatus::Approved && $newStatus !== SalesReturnStatus::Approved) {
             $this->salesReturnService->removeReturn($invoice, $salesReturn);
+        }
+    }
+
+    private function syncInvoiceStatus(Invoice $invoice): void
+    {
+        $invoice->loadSum('approvedReturns', 'total');
+        $approvedTotal = (float) $invoice->approved_returns_sum_total;
+
+        if ($approvedTotal >= (float) $invoice->total) {
+            $invoice->update([
+                'pre_return_status' => $invoice->status,
+                'status' => InvoiceStatus::Returned->value,
+            ]);
+        } elseif ($invoice->status === InvoiceStatus::Returned) {
+            $restoreStatus = $invoice->pre_return_status ?? InvoiceStatus::Sent->value;
+            $invoice->update([
+                'status' => $restoreStatus,
+                'pre_return_status' => null,
+            ]);
         }
     }
 }

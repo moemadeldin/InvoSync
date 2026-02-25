@@ -22,7 +22,7 @@ final class StoreInvoiceRequest extends FormRequest
             'invoice_date' => ['required', 'date'],
             'due_date' => ['required', 'date', 'after_or_equal:invoice_date'],
             'notes' => ['nullable', 'string'],
-            'tax' => ['nullable', 'numeric', 'min:0'],
+            'tax_rate' => ['nullable', 'numeric', 'min:0'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.description' => ['required', 'string', 'max:255'],
             'items.*.qty' => ['required', 'integer', 'min:1'],

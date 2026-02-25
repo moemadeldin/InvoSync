@@ -14,11 +14,8 @@ final readonly class InvoiceItemData
 
     public static function fromArray(array $data): self
     {
-
         $description = $data['description'];
-
         $qty = $data['qty'];
-
         $unitPrice = $data['unit_price'];
 
         return new self(
@@ -26,15 +23,6 @@ final readonly class InvoiceItemData
             qty: (int) $qty,
             unitPrice: (float) $unitPrice,
         );
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'description' => $this->description,
-            'qty' => $this->qty,
-            'unitPrice' => $this->unitPrice,
-        ];
     }
 
     public function total(): float

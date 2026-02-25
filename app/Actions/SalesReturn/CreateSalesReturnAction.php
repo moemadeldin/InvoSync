@@ -4,21 +4,36 @@ declare(strict_types=1);
 
 namespace App\Actions\SalesReturn;
 
+use App\Enums\InvoiceStatus;
+use App\Enums\SalesReturnStatus;
 use App\Models\Invoice;
 use App\Models\SalesReturn;
 use App\Models\User;
+use App\Services\CalculateInvoiceSalesReturnService;
+use Illuminate\Support\Facades\DB;
 
 final readonly class CreateSalesReturnAction
 {
+    public function __construct(
+        private CalculateInvoiceSalesReturnService $salesReturnService,
+    ) {}
+
     public function execute(array $data, User $user): SalesReturn
     {
-        $invoice = Invoice::with('items')->findOrFail($data['invoice_id']);
-        [$itemsToSave, $subtotal] = $this->calculateItemsFromInvoice($data, $invoice);
+        return DB::transaction(function () use ($data, $user): SalesReturn {
+            $invoice = Invoice::with('items')->findOrFail($data['invoice_id']);
+            [$itemsToSave, $subtotal] = $this->calculateItemsFromInvoice($data, $invoice);
 
-        $salesReturn = $this->createSalesReturn($data, $user, $subtotal);
-        $this->saveItems($salesReturn, $itemsToSave);
+            $salesReturn = $this->createSalesReturn($data, $user, $subtotal);
+            $this->saveItems($salesReturn, $itemsToSave);
 
-        return $salesReturn;
+            if ($salesReturn->status === SalesReturnStatus::Approved) {
+                $this->salesReturnService->addReturn($invoice, $salesReturn);
+                $this->syncInvoiceStatus($invoice->fresh());
+            }
+
+            return $salesReturn;
+        });
     }
 
     private function calculateItemsFromInvoice(array $data, Invoice $invoice): array
@@ -28,6 +43,8 @@ final readonly class CreateSalesReturnAction
 
         foreach ($invoice->items as $item) {
             $returnQty = (int) ($data['items'][$item->id]['qty'] ?? 0);
+            $returnQty = min($returnQty, $item->qty);
+
             if ($returnQty > 0) {
                 $itemTotal = $returnQty * (float) $item->unit_price;
                 $subtotal += $itemTotal;
@@ -62,8 +79,19 @@ final readonly class CreateSalesReturnAction
 
     private function saveItems(SalesReturn $salesReturn, array $items): void
     {
-        foreach ($items as $item) {
-            $salesReturn->items()->create($item);
+        $salesReturn->items()->createMany($items);
+    }
+
+    private function syncInvoiceStatus(Invoice $invoice): void
+    {
+        $invoice->loadSum('approvedReturns', 'total');
+        $approvedTotal = (float) $invoice->approved_returns_sum_total;
+
+        if ($approvedTotal >= (float) $invoice->total) {
+            $invoice->update([
+                'pre_return_status' => $invoice->status,
+                'status' => InvoiceStatus::Returned->value,
+            ]);
         }
     }
 }

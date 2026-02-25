@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignUuid('customer_id')
                 ->constrained('customers')
                 ->restrictOnDelete();
-            $table->string('invoice_number')->unique();
+            $table->string('invoice_number');
             $table->date('invoice_date');
             $table->decimal('subtotal', 10, 2)->default(0);
             $table->decimal('tax', 10, 2)->default(0);
@@ -27,6 +27,7 @@ return new class extends Migration
             $table->decimal('total', 10, 2)->default(0);
             $table->decimal('sales_return_total', 10, 2)->default(0);
             $table->string('status')->default(InvoiceStatus::Draft->value);
+            $table->string('pre_return_status')->nullable();
             $table->date('due_date')->nullable();
             $table->text('notes')->nullable();
             $table->unique(['user_id', 'invoice_number']);

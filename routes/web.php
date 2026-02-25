@@ -5,10 +5,14 @@ declare(strict_types=1);
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Customer\CustomerController;
+use App\Http\Controllers\Customer\CustomerStatementController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Invoice\DownloadInvoiceController;
 use App\Http\Controllers\Invoice\InvoiceController;
+use App\Http\Controllers\Invoice\OverdueController;
 use App\Http\Controllers\Invoice\PrintInvoiceController;
+use App\Http\Controllers\Payment\PaymentController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SalesReturn\SalesReturnController;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -25,10 +29,26 @@ Route::middleware('auth')->group(function (): void {
             'invoices' => InvoiceController::class,
             'customers' => CustomerController::class,
         ]);
+        Route::resource('payments', PaymentController::class)->except(['edit', 'update']);
+        Route::resource('sales-returns', SalesReturnController::class)->except(['create']);
+        Route::controller(CustomerStatementController::class)->group(function (): void {
+            Route::get('/statements/customers', 'index')->name('customers.statements.index');
+            Route::get('/statements/customers/{customer}', 'show')->name('customers.statements.show');
+        });
+        Route::controller(ReportController::class)->group(function (): void {
+            Route::get('/reports/daily', 'daily')->name('reports.daily');
+            Route::get('/reports/monthly', 'monthly')->name('reports.monthly');
+            Route::get('/reports/top-customers', 'topCustomers')->name('reports.top-customers');
+            Route::get('/reports/profit', 'profit')->name('reports.profit');
+        });
+
         Route::get('/invoices/{invoice}/download', DownloadInvoiceController::class)->name('invoices.download');
         Route::get('/invoices/{invoice}/print', PrintInvoiceController::class)->name('invoices.print');
+        Route::get('/overdue', OverdueController::class)->name('overdue.index');
+
+        Route::get('/payments/create/{invoice?}', [PaymentController::class, 'create'])->name('payments.create');
         Route::get('/sales-returns/create/{invoice}', [SalesReturnController::class, 'create'])->name('sales-returns.create');
-        Route::resource('sales-returns', SalesReturnController::class)->except(['create']);
+
     });
 });
 Route::prefix('auth')

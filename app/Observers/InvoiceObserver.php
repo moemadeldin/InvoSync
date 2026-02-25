@@ -5,27 +5,32 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Models\Invoice;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 final readonly class InvoiceObserver
 {
     public function creating(Invoice $invoice): void
     {
         if (empty($invoice->invoice_number)) {
-            $invoice->invoice_number = $this->generateInvoiceNumber();
+            $invoice->invoice_number = $this->generateInvoiceNumber($invoice);
         }
     }
 
-    private function generateInvoiceNumber(): string
+    private function generateInvoiceNumber(Invoice $invoice): string
     {
         $year = now()->year;
-        $prefix = 'INV-'.$year.'-';
 
-        do {
-            $random = Str::upper(Str::random(8));
-            $invoiceNumber = $prefix.$random;
-        } while (Invoice::query()->where('invoice_number', $invoiceNumber)->exists());
+        return DB::transaction(function () use ($invoice, $year): string {
+            $count = Invoice::query()
+                ->where('user_id', $invoice->user_id)
+                ->whereYear('created_at', $year)
+                ->withTrashed()
+                ->lockForUpdate()
+                ->count();
 
-        return $invoiceNumber;
+            $sequence = mb_str_pad((string) ($count + 1), 4, '0', STR_PAD_LEFT);
+
+            return sprintf('INV-%d-%s', $year, $sequence);
+        });
     }
 }

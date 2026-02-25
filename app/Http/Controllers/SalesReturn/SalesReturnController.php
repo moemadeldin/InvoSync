@@ -36,7 +36,8 @@ final readonly class SalesReturnController
 
     public function create(Invoice $invoice): View
     {
-        $invoice = Invoice::with(['items', 'customer', 'user'])->findOrFail($invoice->id);
+
+        $invoice->load(['items', 'customer', 'user']);
 
         return view('sales-returns.create', [
             'invoice' => $invoice,

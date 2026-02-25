@@ -14,7 +14,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('invoice_id')
                 ->constrained('invoices')
-                ->restrictOnDelete();
+                ->cascadeOnDelete();
             $table->longText('description');
             $table->integer('qty')->default(1);
             $table->decimal('unit_price', 10, 2)->default(0);

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Actions\SalesReturn;
 
+use App\Enums\InvoiceStatus;
 use App\Enums\SalesReturnStatus;
 use App\Models\SalesReturn;
 use App\Services\CalculateInvoiceSalesReturnService;
+use Illuminate\Support\Facades\DB;
 
 final readonly class DeleteSalesReturnAction
 {
@@ -16,10 +18,22 @@ final readonly class DeleteSalesReturnAction
 
     public function execute(SalesReturn $salesReturn): void
     {
-        if ($salesReturn->invoice_id && $salesReturn->invoice && $salesReturn->status === SalesReturnStatus::Approved) {
-            $this->salesReturnService->removeReturn($salesReturn->invoice, $salesReturn);
-        }
+        DB::transaction(function () use ($salesReturn): void {
+            if ($salesReturn->invoice_id && $salesReturn->status === SalesReturnStatus::Approved) {
+                $invoice = $salesReturn->invoice->fresh();
+                $this->salesReturnService->removeReturn($invoice, $salesReturn);
 
-        $salesReturn->delete();
+                $invoice = $invoice->fresh();
+                if ($invoice->status === InvoiceStatus::Returned) {
+                    $restoreStatus = $invoice->pre_return_status ?? InvoiceStatus::Sent->value;
+                    $invoice->update([
+                        'status' => $restoreStatus,
+                        'pre_return_status' => null,
+                    ]);
+                }
+            }
+
+            $salesReturn->delete();
+        });
     }
 }

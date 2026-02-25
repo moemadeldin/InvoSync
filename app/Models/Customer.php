@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +27,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read User $user
+ * @property-read float $total_invoiced
+ * @property-read float $total_paid
+ * @property-read float $total_returns
+ * @property-read float $balance
+ * @property-read string $formatted_total_invoiced
+ * @property-read string $formatted_total_paid
+ * @property-read string $formatted_total_returns
+ * @property-read string $formatted_balance
  */
 #[ScopedBy([TenantScope::class])]
 final class Customer extends Model
@@ -61,6 +70,67 @@ final class Customer extends Model
     public function salesReturns(): HasMany
     {
         return $this->hasMany(SalesReturn::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    protected function totalInvoiced(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): float => (float) $this->invoices()->sum('total'),
+        );
+    }
+
+    protected function totalPaid(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): float => (float) $this->invoices()->with('payments')->get()->sum(fn ($inv) => $inv->payments()->sum('amount')),
+        );
+    }
+
+    protected function totalReturns(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): float => (float) $this->salesReturns()->where('status', 'approved')->sum('total'),
+        );
+    }
+
+    protected function balance(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): float => $this->total_invoiced - $this->total_paid - $this->total_returns,
+        );
+    }
+
+    protected function formattedTotalInvoiced(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => number_format($this->total_invoiced, 2),
+        );
+    }
+
+    protected function formattedTotalPaid(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => number_format($this->total_paid, 2),
+        );
+    }
+
+    protected function formattedTotalReturns(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => number_format($this->total_returns, 2),
+        );
+    }
+
+    protected function formattedBalance(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => number_format($this->balance, 2),
+        );
     }
 
     #[Scope]

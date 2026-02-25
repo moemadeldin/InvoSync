@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\InvoiceStatus;
+use App\Enums\SalesReturnStatus;
 use App\Models\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -87,6 +88,44 @@ final class Invoice extends Model
     public function salesReturns(): HasMany
     {
         return $this->hasMany(SalesReturn::class);
+    }
+
+    public function approvedReturns(): HasMany
+    {
+        return $this->hasMany(SalesReturn::class)
+            ->where('status', SalesReturnStatus::Approved->value);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    protected function getPaidAmountAttribute(): float
+    {
+        return (float) $this->payments()->sum('amount');
+    }
+
+    protected function getRemainingAmountAttribute(): float
+    {
+        return (float) $this->total - $this->paid_amount;
+    }
+
+    protected function getPaymentStatusAttribute(): string
+    {
+        $paid = $this->paid_amount;
+        $total = (float) $this->total;
+
+        if ($paid <= 0) {
+            return 'unpaid';
+        }
+
+        if ($paid >= $total) {
+            return 'paid';
+        }
+
+        return 'partial';
+
     }
 
     protected function formattedSubtotal(): Attribute
@@ -187,5 +226,18 @@ final class Invoice extends Model
     protected function withCustomerAndUsers(Builder $query): Builder
     {
         return $query->with(['customer', 'user'])->latest();
+    }
+
+    #[Scope]
+    protected function overdue(Builder $query): Builder
+    {
+        return $query->where('due_date', '<', now()->toDateString())
+            ->where('status', '!=', InvoiceStatus::Paid->value);
+    }
+
+    #[Scope]
+    protected function overdueDays(Builder $query): Builder
+    {
+        return $query->selectRaw('*, DATEDIFF(CURRENT_DATE, due_date) as days_overdue');
     }
 }

@@ -23,7 +23,7 @@ final readonly class StoreInvoiceData
         $status = $data['status'];
         $taxRate = (float) ($data['tax_rate'] ?? 0);
         $invoiceDate = $data['invoice_date'];
-        $dueDate = $data['due_date'] ?? null;
+        $dueDate = $data['due_date'];
         $notes = $data['notes'] ?? null;
 
         return new self(
@@ -38,18 +38,5 @@ final readonly class StoreInvoiceData
             dueDate: $dueDate,
             notes: $notes !== null ? (string) $notes : null,
         );
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'customer_id' => $this->customerId,
-            'items' => $this->items,
-            'status' => $this->status,
-            'tax_rate' => $this->taxRate,
-            'invoice_date' => $this->invoiceDate,
-            'due_date' => $this->dueDate,
-            'notes' => $this->notes,
-        ];
     }
 }

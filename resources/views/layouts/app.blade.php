@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', config('app.name', 'Dashboard'))</title>
     @vite('resources/css/app.css')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -93,6 +94,33 @@
                                 class="inline-flex items-center px-1 pt-1 text-sm font-medium text-slate-200 hover:text-slate-50 border-b-2 border-transparent hover:border-indigo-500 transition-colors">
                                 Sales Returns
                             </a>
+                            <a href="{{ route('payments.index') }}"
+                                class="inline-flex items-center px-1 pt-1 text-sm font-medium text-slate-200 hover:text-slate-50 border-b-2 border-transparent hover:border-indigo-500 transition-colors">
+                                Payments
+                            </a>
+                            <a href="{{ route('overdue.index') }}"
+                                class="inline-flex items-center px-1 pt-1 text-sm font-medium text-red-400 hover:text-red-300 border-b-2 border-transparent hover:border-red-500 transition-colors">
+                                Overdue
+                            </a>
+                            <a href="{{ route('customers.statements.index') }}"
+                                class="inline-flex items-center px-1 pt-1 text-sm font-medium text-slate-200 hover:text-slate-50 border-b-2 border-transparent hover:border-indigo-500 transition-colors">
+                                Statements
+                            </a>
+                            <div class="relative h-full" x-data="{ open: false }">
+                                <button @click="open = !open" @click.outside="open = false"
+                                    class="inline-flex items-center px-1 pt-1 text-sm font-medium text-slate-200 hover:text-slate-50 border-b-2 border-transparent hover:border-indigo-500 transition-colors h-full">
+                                    Reports
+                                    <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                <div x-show="open" class="absolute left-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-50" style="display: none;">
+                                    <a href="{{ route('reports.daily') }}" class="block px-4 py-2 text-sm text-slate-200 hover:bg-slate-700">Daily Sales</a>
+                                    <a href="{{ route('reports.monthly') }}" class="block px-4 py-2 text-sm text-slate-200 hover:bg-slate-700">Monthly Sales</a>
+                                    <a href="{{ route('reports.top-customers') }}" class="block px-4 py-2 text-sm text-slate-200 hover:bg-slate-700">Top Customers</a>
+                                    <a href="{{ route('reports.profit') }}" class="block px-4 py-2 text-sm text-slate-200 hover:bg-slate-700">Profit Report</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

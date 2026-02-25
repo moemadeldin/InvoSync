@@ -116,6 +116,17 @@
                                             Return
                                         </a>
                                     @endif
+                                    @if(! in_array($invoice->status, [
+                                            InvoiceStatus::Paid,
+                                            InvoiceStatus::Returned,
+                                            InvoiceStatus::Cancelled
+                                        ]))
+                                        <a href="{{ route('payments.create', $invoice->id) }}"
+                                            class="px-4 py-2 rounded-lg text-white font-semibold text-xs bg-blue-600 hover:bg-blue-500 transition-all"
+                                            title="Record Payment">
+                                            Pay
+                                        </a>
+                                    @endif
                                     <a href="{{ route('invoices.edit', $invoice) }}"
                                         class="px-4 py-2 rounded-lg text-white font-semibold text-xs bg-slate-700 hover:bg-slate-600 transition-all">
                                         Edit
