@@ -3,9 +3,6 @@
 @section('title', 'Sales Return Details')
 
 @section('content')
-    @php
-        use App\Enums\SalesReturnStatus;
-    @endphp
     <div class="max-w-4xl mx-auto">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-semibold text-slate-50">Sales Return Details</h1>
@@ -32,23 +29,6 @@
                     <span class="px-3 py-1 text-sm rounded {{ $salesReturn->status->badgeClass() }}">
                         {{ $salesReturn->status->label() }}
                     </span>
-                    @if($salesReturn->status === SalesReturnStatus::Pending)
-                        <form action="{{ route('sales-returns.update', $salesReturn) }}" method="POST" class="flex gap-2">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="status" value="approved">
-                            <button type="submit"
-                                class="px-3 py-1 text-xs bg-green-600 hover:bg-green-500 rounded text-white">Approve</button>
-                        </form>
-                    @elseif($salesReturn->status === SalesReturnStatus::Rejected)
-                        <form action="{{ route('sales-returns.update', $salesReturn) }}" method="POST" class="flex gap-2">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="status" value="approved">
-                            <button type="submit"
-                                class="px-3 py-1 text-xs bg-green-600 hover:bg-green-500 rounded text-white">Approve</button>
-                        </form>
-                    @endif
                 </div>
             </div>
 

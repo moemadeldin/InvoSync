@@ -17,7 +17,8 @@
         <div class="bg-slate-800 rounded-2xl p-8 shadow-lg mb-6">
             <div class="grid grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-slate-400 text-xs font-medium uppercase tracking-wide mb-1">Payment Date</label>
+                    <label class="block text-slate-400 text-xs font-medium uppercase tracking-wide mb-1">Payment
+                        Date</label>
                     <p class="text-slate-50">{{ $payment->payment_date->format('Y-m-d') }}</p>
                 </div>
                 <div>
@@ -25,11 +26,13 @@
                     <p class="text-green-400 text-xl font-bold">${{ $payment->formatted_amount }}</p>
                 </div>
                 <div>
-                    <label class="block text-slate-400 text-xs font-medium uppercase tracking-wide mb-1">Payment Method</label>
+                    <label class="block text-slate-400 text-xs font-medium uppercase tracking-wide mb-1">Payment
+                        Method</label>
                     <p class="text-slate-50">{{ $payment->payment_method->label() }}</p>
                 </div>
                 <div>
-                    <label class="block text-slate-400 text-xs font-medium uppercase tracking-wide mb-1">Reference Number</label>
+                    <label class="block text-slate-400 text-xs font-medium uppercase tracking-wide mb-1">Reference
+                        Number</label>
                     <p class="text-slate-50">{{ $payment->reference_number ?? '-' }}</p>
                 </div>
                 <div>
@@ -65,7 +68,10 @@
                 </div>
                 <div class="p-3 bg-slate-900 rounded-lg">
                     <p class="text-slate-400">Remaining</p>
-                    <p class="text-red-400 font-semibold">${{ number_format($payment->invoice->remaining_amount, 2) }}</p>
+                    <p
+                        class="font-semibold {{ $payment->invoice->remaining_amount > 0 ? 'text-red-400' : 'text-green-400' }}">
+                        ${{ number_format($payment->invoice->remaining_amount, 2) }}
+                    </p>
                 </div>
             </div>
 

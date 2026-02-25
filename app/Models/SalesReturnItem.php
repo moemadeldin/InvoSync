@@ -22,8 +22,11 @@ use Illuminate\Support\Carbon;
  * @property numeric $total
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read SalesReturn $salesReturn
+ * @property Carbon|null $deleted_at
+ * @property-read string $formatted_total
+ * @property-read string $formatted_unit_price
  * @property-read InvoiceItem|null $invoiceItem
+ * @property-read SalesReturn $salesReturn
  */
 final class SalesReturnItem extends Model
 {

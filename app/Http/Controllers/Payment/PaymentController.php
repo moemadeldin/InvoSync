@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Payment;
 
 use App\Actions\Payment\CreatePaymentAction;
 use App\Actions\Payment\DeletePaymentAction;
+use App\Enums\InvoiceStatus;
 use App\Http\Requests\Payment\FilterPaymentRequest;
 use App\Http\Requests\Payment\StorePaymentRequest;
 use App\Models\Invoice;
@@ -36,6 +37,9 @@ final readonly class PaymentController
     {
         $invoices = Invoice::query()
             ->withCustomerAndUsers()
+            ->whereNotIn('status', [InvoiceStatus::Paid,
+                InvoiceStatus::Cancelled,
+                InvoiceStatus::Returned, ])
             ->get();
 
         $selectedInvoice = null;

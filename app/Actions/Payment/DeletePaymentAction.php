@@ -7,15 +7,24 @@ namespace App\Actions\Payment;
 use App\Enums\InvoiceStatus;
 use App\Models\Invoice;
 use App\Models\Payment;
+use Illuminate\Support\Facades\DB;
 
 final readonly class DeletePaymentAction
 {
     public function execute(Payment $payment): void
     {
-        $invoice = $payment->invoice;
-        $payment->delete();
+        DB::transaction(function () use ($payment): void {
+            $invoice = Invoice::query()
+                ->where('id', $payment->invoice_id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $this->revertInvoiceStatus($invoice);
+            $payment->delete();
+
+            if ($invoice) {
+                $this->revertInvoiceStatus($invoice);
+            }
+        });
     }
 
     private function revertInvoiceStatus(Invoice $invoice): void

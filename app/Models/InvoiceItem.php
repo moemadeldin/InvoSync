@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,8 +23,12 @@ use Illuminate\Support\Carbon;
  * @property numeric $total
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property Carbon|null $deleted_at
+ * @property-read string $formatted_total
+ * @property-read string $formatted_unit_price
  * @property-read Invoice $invoice
+ * @property-read Collection<int, SalesReturnItem> $salesReturnItems
+ * @property-read int|null $sales_return_items_count
  */
 final class InvoiceItem extends Model
 {

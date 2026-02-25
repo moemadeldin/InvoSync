@@ -67,7 +67,6 @@ final readonly class SalesReturnController
         return view('sales-returns.edit', [
             'salesReturn' => $salesReturn,
             'invoice' => $invoice,
-            'invoiceItems' => $invoice?->items,
         ]);
     }
 

@@ -118,7 +118,7 @@
                 @endif
 
                 <button type="submit"
-                    class="w-full py-3 rounded-lg text-white font-semibold text-sm gradient-primary hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    class="cursor-pointer w-full py-3 rounded-lg text-white font-semibold text-sm gradient-primary hover:shadow-lg hover:-translate-y-0.5 transition-all">
                     Update Sales Return
                 </button>
             </form>

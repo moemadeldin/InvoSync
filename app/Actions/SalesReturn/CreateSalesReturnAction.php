@@ -21,7 +21,11 @@ final readonly class CreateSalesReturnAction
     public function execute(array $data, User $user): SalesReturn
     {
         return DB::transaction(function () use ($data, $user): SalesReturn {
-            $invoice = Invoice::with('items')->findOrFail($data['invoice_id']);
+            $invoice = Invoice::query()
+                ->with('items')
+                ->where('id', $data['invoice_id'])
+                ->lockForUpdate()
+                ->findOrFail($data['invoice_id']);
             [$itemsToSave, $subtotal] = $this->calculateItemsFromInvoice($data, $invoice);
 
             $salesReturn = $this->createSalesReturn($data, $user, $subtotal);

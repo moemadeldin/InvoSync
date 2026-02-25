@@ -23,7 +23,8 @@
                         <option value="">Select Invoice</option>
                         @foreach($invoices as $invoice)
                             <option value="{{ $invoice->id }}" {{ $invoice_id == $invoice->id ? 'selected' : '' }}>
-                                {{ $invoice->invoice_number }} - {{ $invoice->customer->name }} - ${{ number_format((float) $invoice->total, 2) }}
+                                {{ $invoice->invoice_number }} - {{ $invoice->customer->name }} -
+                                ${{ number_format((float) $invoice->total, 2) }}
                             </option>
                         @endforeach
                     </select>
@@ -46,15 +47,13 @@
                             </div>
                             <div>
                                 <span class="text-slate-400">Remaining:</span>
-                                <span class="text-red-400 ml-2">${{ number_format($selectedInvoice->remaining_amount, 2) }}</span>
+                                <span
+                                    class="text-red-400 ml-2">${{ number_format($selectedInvoice->remaining_amount, 2) }}</span>
                             </div>
                             <div>
                                 <span class="text-slate-400">Status:</span>
-                                <span class="px-2 py-0.5 text-xs rounded 
-                                    @if($selectedInvoice->payment_status === 'paid') bg-green-900 text-green-300
-                                    @elseif($selectedInvoice->payment_status === 'partial') bg-yellow-900 text-yellow-300
-                                    @else bg-red-900 text-red-300 @endif">
-                                    {{ ucfirst($selectedInvoice->payment_status) }}
+                                <span class="px-2 py-0.5 text-xs rounded {{ $selectedInvoice->payment_status->badgeClass() }}">
+                                    {{ $selectedInvoice->payment_status->label() }}
                                 </span>
                             </div>
                         </div>
@@ -81,7 +80,8 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="payment_method" class="block text-slate-300 text-sm font-medium mb-2">Payment Method</label>
+                        <label for="payment_method" class="block text-slate-300 text-sm font-medium mb-2">Payment
+                            Method</label>
                         <select name="payment_method" id="payment_method" required
                             class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">
                             @foreach(\App\Enums\PaymentMethod::cases() as $method)
@@ -91,7 +91,8 @@
                     </div>
 
                     <div>
-                        <label for="reference_number" class="block text-slate-300 text-sm font-medium mb-2">Reference Number (Optional)</label>
+                        <label for="reference_number" class="block text-slate-300 text-sm font-medium mb-2">Reference Number
+                            (Optional)</label>
                         <input type="text" name="reference_number" id="reference_number"
                             value="{{ old('reference_number') }}"
                             class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">
@@ -105,7 +106,7 @@
                 </div>
 
                 <button type="submit"
-                    class="w-full py-3 rounded-lg text-white font-semibold text-sm gradient-primary hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    class="cursor-pointer w-full py-3 rounded-lg text-white font-semibold text-sm gradient-primary hover:shadow-lg hover:-translate-y-0.5 transition-all">
                     Record Payment
                 </button>
             </form>

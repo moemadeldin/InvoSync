@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\TenantScope;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
@@ -24,17 +25,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $email
  * @property string|null $phone
  * @property string|null $address
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property-read User $user
- * @property float|null $total_invoiced
- * @property float|null $total_paid
- * @property float|null $total_returns
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
  * @property-read float $balance
+ * @property-read string $formatted_balance
  * @property-read string $formatted_total_invoiced
  * @property-read string $formatted_total_paid
  * @property-read string $formatted_total_returns
- * @property-read string $formatted_balance
+ * @property-read Collection<int, Invoice> $invoices
+ * @property-read int|null $invoices_count
+ * @property-read Collection<int, Payment> $payments
+ * @property-read int|null $payments_count
+ * @property-read Collection<int, SalesReturn> $salesReturns
+ * @property-read int|null $sales_returns_count
+ * @property-read float $total_invoiced
+ * @property-read float $total_paid
+ * @property-read float $total_returns
+ * @property-read User $user
  */
 #[ScopedBy([TenantScope::class])]
 final class Customer extends Model

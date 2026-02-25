@@ -29,9 +29,11 @@ use Illuminate\Support\Carbon;
  * @property string|null $notes
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read User $user
- * @property-read Invoice $invoice
+ * @property Carbon|null $deleted_at
  * @property-read Customer $customer
+ * @property-read string $formatted_amount
+ * @property-read Invoice $invoice
+ * @property-read User $user
  */
 #[ScopedBy([TenantScope::class])]
 final class Payment extends Model

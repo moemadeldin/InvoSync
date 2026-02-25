@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\InvoiceStatus;
+use App\Enums\PaymentStatus;
 use App\Enums\SalesReturnStatus;
 use App\Models\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -25,22 +26,39 @@ use Illuminate\Support\Carbon;
  * @property string $user_id
  * @property string $customer_id
  * @property string $invoice_number
+ * @property Carbon $invoice_date
  * @property numeric $subtotal
  * @property numeric $tax
  * @property numeric $tax_rate
  * @property numeric $total
  * @property numeric $sales_return_total
  * @property InvoiceStatus $status
- * @property Carbon|null $invoice_date
+ * @property string|null $pre_return_status
  * @property Carbon|null $due_date
  * @property string|null $notes
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property Carbon|null $deleted_at
+ * @property-read float $adjusted_total
+ * @property-read Collection<int, SalesReturn> $approvedReturns
+ * @property-read int|null $approved_returns_count
  * @property-read Customer $customer
+ * @property-read string $formatted_adjusted_total
+ * @property-read string $formatted_sales_return_total
+ * @property-read string $formatted_subtotal
+ * @property-read string $formatted_tax
+ * @property-read string $formatted_tax_rate
+ * @property-read string $formatted_total
+ * @property-read float $paid_amount
+ * @property-read string $payment_status
+ * @property-read float $remaining_amount
  * @property-read Collection<int, InvoiceItem> $items
- * @property-read User $user
+ * @property-read int|null $items_count
+ * @property-read Collection<int, Payment> $payments
+ * @property-read int|null $payments_count
  * @property-read Collection<int, SalesReturn> $salesReturns
+ * @property-read int|null $sales_returns_count
+ * @property-read User $user
  */
 #[ScopedBy([TenantScope::class])]
 final class Invoice extends Model
@@ -66,6 +84,7 @@ final class Invoice extends Model
         'total' => 'decimal:2',
         'sales_return_total' => 'decimal:2',
         'status' => InvoiceStatus::class,
+        'pre_return_status' => InvoiceStatus::class,
         'due_date' => 'date',
         'notes' => 'string',
     ];
@@ -101,31 +120,35 @@ final class Invoice extends Model
         return $this->hasMany(Payment::class);
     }
 
-    protected function getPaidAmountAttribute(): float
+    protected function paidAmount(): Attribute
     {
-        return (float) $this->payments()->sum('amount');
+        return Attribute::make(
+            get: fn (): float => (float) $this->payments()->sum('amount'),
+        );
     }
 
-    protected function getRemainingAmountAttribute(): float
+    protected function remainingAmount(): Attribute
     {
-        return (float) $this->total - $this->paid_amount;
+        return Attribute::make(
+
+            get: fn (): float => max(0.0, (float) $this->total - $this->paid_amount),
+        );
     }
 
-    protected function getPaymentStatusAttribute(): string
+    protected function paymentStatus(): Attribute
     {
-        $paid = $this->paid_amount;
-        $total = (float) $this->total;
+        return Attribute::make(
+            get: function (): PaymentStatus {
+                $paid = $this->paid_amount;
+                $total = (float) $this->total;
 
-        if ($paid <= 0) {
-            return 'unpaid';
-        }
-
-        if ($paid >= $total) {
-            return 'paid';
-        }
-
-        return 'partial';
-
+                return match (true) {
+                    $paid <= 0 => PaymentStatus::Unpaid,
+                    $paid >= $total => PaymentStatus::Paid,
+                    default => PaymentStatus::Partial,
+                };
+            },
+        );
     }
 
     protected function formattedSubtotal(): Attribute

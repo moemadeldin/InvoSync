@@ -108,7 +108,7 @@
                             </a>
                             <div class="relative h-full" x-data="{ open: false }">
                                 <button @click="open = !open" @click.outside="open = false"
-                                    class="inline-flex items-center px-1 pt-1 text-sm font-medium text-slate-200 hover:text-slate-50 border-b-2 border-transparent hover:border-indigo-500 transition-colors h-full">
+                                    class="cursor-pointer inline-flex items-center px-1 pt-1 text-sm font-medium text-slate-200 hover:text-slate-50 border-b-2 border-transparent hover:border-indigo-500 transition-colors h-full">
                                     Reports
                                     <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>

@@ -54,11 +54,14 @@ final class SalesReturn extends Model
         'user_id' => 'string',
         'customer_id' => 'string',
         'invoice_id' => 'string',
+        'return_number' => 'string',
         'return_date' => 'date',
         'subtotal' => 'decimal:2',
         'tax' => 'decimal:2',
         'total' => 'decimal:2',
         'status' => SalesReturnStatus::class,
+        'reason' => 'string',
+        'notes' => 'string',
     ];
 
     public function user(): BelongsTo

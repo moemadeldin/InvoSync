@@ -24,7 +24,12 @@ final readonly class UpdateSalesReturnAction
             $newStatus = SalesReturnStatus::from($data['status']);
 
             if (! empty($data['invoice_id'])) {
-                $invoice = Invoice::with('items')->findOrFail($data['invoice_id']);
+                $invoice = Invoice::query()
+                    ->with('items')
+                    ->where('id', $data['invoice_id'])
+                    ->lockForUpdate()
+                    ->findOrFail($data['invoice_id']);
+
                 [$itemsToSave, $subtotal] = $this->calculateItemsFromInvoice($data, $invoice);
 
                 $this->updateSalesReturn($salesReturn, $data, $subtotal);
