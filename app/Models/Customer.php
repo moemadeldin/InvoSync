@@ -27,9 +27,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read User $user
- * @property-read float $total_invoiced
- * @property-read float $total_paid
- * @property-read float $total_returns
+ * @property float|null $total_invoiced
+ * @property float|null $total_paid
+ * @property float|null $total_returns
  * @property-read float $balance
  * @property-read string $formatted_total_invoiced
  * @property-read string $formatted_total_paid
@@ -43,11 +43,6 @@ final class Customer extends Model
     use HasUuids;
     use SoftDeletes;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected $casts = [
         'id' => 'string',
         'user_id' => 'string',
@@ -80,28 +75,30 @@ final class Customer extends Model
     protected function totalInvoiced(): Attribute
     {
         return Attribute::make(
-            get: fn (): float => (float) $this->invoices()->sum('total'),
+            get: fn (): float => (float) ($this->attributes['total_invoiced'] ?? 0.0),
         );
     }
 
     protected function totalPaid(): Attribute
     {
         return Attribute::make(
-            get: fn (): float => (float) $this->invoices()->with('payments')->get()->sum(fn ($inv) => $inv->payments()->sum('amount')),
+            get: fn (): float => (float) ($this->attributes['total_paid'] ?? 0.0),
         );
     }
 
     protected function totalReturns(): Attribute
     {
         return Attribute::make(
-            get: fn (): float => (float) $this->salesReturns()->where('status', 'approved')->sum('total'),
+            get: fn (): float => (float) ($this->attributes['total_returns'] ?? 0.0),
         );
     }
 
     protected function balance(): Attribute
     {
         return Attribute::make(
-            get: fn (): float => $this->total_invoiced - $this->total_paid - $this->total_returns,
+            get: fn (): float => (float) ($this->attributes['total_invoiced'] ?? 0.0)
+                - (float) ($this->attributes['total_paid'] ?? 0.0)
+                - (float) ($this->attributes['total_returns'] ?? 0.0),
         );
     }
 
