@@ -16,9 +16,7 @@ final readonly class ExternalProvisionController
 
     public function __invoke(StoreUserRequest $request, CreateUserAction $action): JsonResponse
     {
-        /** @var array{name: string, email: string, password: string} $data */
-        $data = $request->validated();
-        $user = $action->execute($data);
+        $user = $action->execute($request->validated());
 
         return $this->success($user, 'Teacher Registered Successfully.', Response::HTTP_CREATED);
     }

@@ -13,11 +13,10 @@ final readonly class SendInvoiceToCustomer
     public function handle(InvoiceSentToCustomer $event): void
     {
         $invoice = $event->invoice;
+
         $invoice->load(['customer', 'items']);
 
-        /** @var string|null $email */
-        $email = $invoice->customer->email;
-        Mail::to($email)->send(new InvoiceCreatedMail($invoice));
+        Mail::to($invoice->customer->email)->send(new InvoiceCreatedMail($invoice));
 
     }
 }

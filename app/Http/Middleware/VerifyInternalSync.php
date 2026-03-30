@@ -21,9 +21,6 @@ final readonly class VerifyInternalSync
             return $this->fail('Unauthorized Handshake', Response::HTTP_UNAUTHORIZED);
         }
 
-        /** @var Response $result */
-        $result = $next($request);
-
-        return $result;
+        return $next($request);
     }
 }

@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 final readonly class SyncExternalInvoiceAction
 {
-    /**
-     * @param  array{customer_email: string, customer_name: string, customer_phone: string, customer_company: string, user_id: string}  $data
-     */
     public function execute(array $data): Invoice
     {
         return DB::transaction(function () use ($data): Invoice {
@@ -29,9 +26,6 @@ final readonly class SyncExternalInvoiceAction
         });
     }
 
-    /**
-     * @param  array{customer_email: string, customer_name: string, customer_phone: string, customer_company: string, user_id: string}  $data
-     */
     private function findOrCreateCustomer(array $data): Customer
     {
         return Customer::query()
@@ -40,13 +34,10 @@ final readonly class SyncExternalInvoiceAction
                 'email' => $data['customer_email'],
                 'phone' => $data['customer_phone'] ?? null,
                 'company' => $data['customer_company'] ?? null,
-                'user_id' => $data['user_id']
+                'user_id' => $data['user_id'],
             ]);
     }
 
-    /**
-     * @param  array{user_id: string, amount: float}  $data
-     */
     private function createInvoice(Customer $customer, array $data): Invoice
     {
         return Invoice::query()->create([
@@ -60,9 +51,6 @@ final readonly class SyncExternalInvoiceAction
         ]);
     }
 
-    /**
-     * @param  array{description: string, amount: float}  $data
-     */
     private function createInvoiceItem(Invoice $invoice, array $data): void
     {
         $invoice->items()->create([

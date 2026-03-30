@@ -24,11 +24,9 @@ final class InvoiceCreatedMail extends Mailable implements ShouldQueue
 
     public function envelope(): Envelope
     {
-        /** @var string $appName */
-        $appName = config('app.name');
 
         return new Envelope(
-            subject: 'Invoice from '.$appName,
+            subject: 'Invoice from '.config('app.name'),
         );
     }
 

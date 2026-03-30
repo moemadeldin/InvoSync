@@ -16,9 +16,7 @@ final readonly class ExternalInvoiceController
 
     public function __invoke(StoreExternalInvoiceRequest $request, SyncExternalInvoiceAction $action): JsonResponse
     {
-        /** @var array{customer_email: string, customer_name: string, user_id: string, amount: float, description: string} $data */
-        $data = $request->validated();
-        $invoice = $action->execute($data);
+        $invoice = $action->execute($request->validated());
 
         return $this->success($invoice, 'Invoice and client synced successfully', Response::HTTP_CREATED);
     }

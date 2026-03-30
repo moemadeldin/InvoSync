@@ -59,7 +59,7 @@ final class Customer extends Model
         'email' => 'string',
         'phone' => 'string',
         'address' => 'string',
-        'company' => 'string'
+        'company' => 'string',
     ];
 
     public function user(): BelongsTo

@@ -9,9 +9,6 @@ use Illuminate\Http\Response;
 
 trait APIResponder
 {
-    /**
-     * @param  array<string, mixed>|object  $data
-     */
     protected function success(array|object $data, string $message, int $code = Response::HTTP_OK): JsonResponse
     {
         return response()->json([
