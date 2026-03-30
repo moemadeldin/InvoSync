@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'InvoSync'),
 
     /*
     |--------------------------------------------------------------------------
@@ -124,5 +124,5 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
-
+    'internal_sync_token' => env('INTERNAL_SYNC_TOKEN'),
 ];

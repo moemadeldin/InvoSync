@@ -16,6 +16,7 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @property int $id
@@ -31,6 +32,7 @@ use Illuminate\Support\Carbon;
  */
 final class User extends Authenticatable
 {
+    use HasApiTokens;
     use HasFactory;
     use HasUuids;
     use Notifiable;
