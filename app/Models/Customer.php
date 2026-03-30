@@ -24,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $email
  * @property string|null $phone
+ * @property string|null $company
  * @property string|null $address
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -58,6 +59,7 @@ final class Customer extends Model
         'email' => 'string',
         'phone' => 'string',
         'address' => 'string',
+        'company' => 'string'
     ];
 
     public function user(): BelongsTo

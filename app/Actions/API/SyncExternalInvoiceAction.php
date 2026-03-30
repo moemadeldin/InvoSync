@@ -40,7 +40,7 @@ final readonly class SyncExternalInvoiceAction
                 'email' => $data['customer_email'],
                 'phone' => $data['customer_phone'] ?? null,
                 'company' => $data['customer_company'] ?? null,
-                'user_id', $data['user_id']
+                'user_id' => $data['user_id']
             ]);
     }
 
@@ -56,6 +56,7 @@ final readonly class SyncExternalInvoiceAction
             'subtotal' => $data['amount'],
             'status' => InvoiceStatus::Paid->value,
             'due_date' => now(),
+            'invoice_date' => now(),
         ]);
     }
 
